@@ -1,0 +1,35 @@
+version: '3'
+services:
+  dvwa:
+    # container_name: dvwa
+    build: ./dvwa
+    ports:
+    - "8080:80"
+    volumes:
+      - ./dvwa/filebeat_http.yml:/etc/filebeat/filebeat_http.yml
+      - ./dvwa/start.sh:/start.sh
+  es:
+    # container_name: es
+    image: elasticsearch:7.17.0
+    environment:
+      - "cluster.name=elasticsearch"
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx1024m"
+    volumes:
+      - ./es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ports:  # Need to map ports?
+      - 9200:9200
+  kibana:
+    # container_name: kibana
+    image: kibana:7.17.0
+    depends_on:
+      - es
+    environment:
+      - ELASTICSEARCH_URL=http://es:9200
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - 5601:5601
+# networks:
+#     default:
+#       name: cyberxx

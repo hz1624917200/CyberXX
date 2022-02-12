@@ -1,0 +1,26 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/www/html/vulnerabilities/log/*
+  encoding: utf-8
+  json.add_error_key: false
+  message: "Submission from user"
+  tags: ["submission"]
+
+# output.console:
+#   pretty: true
+output.elasticsearch:
+  hosts: ["http://es:9200"]
+
+setup.template.enabled: true
+setup.template.name: "filebeat-7-template"
+setup.template.pattern: "filebeat-7*"
+setup.template.fields: "fields.yml"
+setup.template.overwrite: true
+setup.template.settings:
+  index.number_of_shards: 1
+  index.number_of_replicas: 0
+setup.ilm.enabled: auto
+setup.ilm.rollover_alias: "filebeat"
+setup.ilm.pattern: "{now/d}"
